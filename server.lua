@@ -14,7 +14,7 @@
 --   GetHomeTheme(key)            -> id | nil (unknown home)
 -- Console / ace-restricted commands for tests without whip_core: wh_theme_set <home> <id>, wh_theme_list
 -- (whip_core's next SetAllThemes replaces whatever they set).
-local VERSION = '0.11.13'
+local VERSION = '0.12.0'
 local THEMES = {
     { id = 0, key = 'original', name = 'Original', walls = '#b2a899', trim = '#c4c1b4', skirting = '#b9b5a8', floor = '#997852', floorName = 'honey oak' },
     { id = 1, key = 'charcoal', name = 'Charcoal', walls = '#424244', trim = '#e6e3db', skirting = '#e6e3db', floor = '#927454', floorName = 'natural oak' },

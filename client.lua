@@ -1,7 +1,7 @@
 -- Whippy Mirror Park homes: every walk-in home placement of the resource. Matte-window fade, interior loader, a conflict
 -- warning and read-only diagnostics. The homes' doors are NOT registered here: the server's door system (whip_core)
 -- owns them (user decision 2026-10-04; a second door-system key for the same door can be refused by the game).
-local VERSION = '0.11.13'
+local VERSION = '0.12.0'
 local doors = {
     { id = 'whippy_mp_mp_d01_p01_mp_d01_door_01', model = 'mp_d01_door_01', house = 'mp_d01_p01', position = vector3(905.6659849, -489.3123253, 59.5532800) },
     { id = 'whippy_mp_mp_d01_p01_mp_d01_door_02', model = 'mp_d01_door_02', house = 'mp_d01_p01', position = vector3(899.2794967, -474.6458880, 59.5682800) },
@@ -359,8 +359,9 @@ end
 -- (the d08/d19 house garages and the site garages' panels), this client wakes that door every frame, which is what the
 -- patch does. GTA's own door logic, and whip_core's door system with its locks, still decide when it opens: nothing is
 -- registered, unlocked or forced here.
--- 0.11.12 (CPU, the server session's resmon note): FiveM's own patch covers Legacy, so the Legacy copy leaves it off
--- (its fxmanifest says mirror_park_game 'legacy'; any other copy, or none, has it on). The doors and their objects
+-- 0.11.12 (CPU, the server session's resmon note): FiveM's own patch covers Legacy, so on Legacy it is off. 0.12.0: the
+-- game is whip's whip_platform convar (setr whip_platform enhanced in an Enhanced server.cfg; unset is Legacy, as
+-- whip_core reads it), no longer a line in a separate Enhanced copy's fxmanifest. The doors and their objects
 -- are looked up on the scan, WAKE_SCAN_MS apart; in between a near door gets only ActivatePhysics, every frame. With
 -- no door near, the scan sleeps until the nearest one could be within reach (WAKE_SPEED), 250 ms to 1 s.
 -- F8: wh_garage_doors (status of the doors near you), wh_garage_doors off / on (switch it for a side-by-side test).
@@ -413,8 +414,8 @@ local WAKE_DOORS = {
     { name = 'wh_bng_p06_gar_door_01', pos = vector3(867.6995, -594.8890, 58.5204) }, -- wh_bng_p06_gar
     { name = 'wh_bng_p07_gar_door_01', pos = vector3(969.4103, -688.6887, 58.1340) }, -- wh_bng_p07_gar
 }
-local WAKE_GAME = GetResourceMetadata(GetCurrentResourceName(), 'mirror_park_game', 0)
-local wakeOn = WAKE_GAME ~= 'legacy'
+local WAKE_GAME = string.lower(GetConvar('whip_platform', 'legacy'))
+local wakeOn = WAKE_GAME == 'enhanced'
 local function wakeU32(h) return h % 4294967296 end      -- hashes come back signed or unsigned
 for _, d in ipairs(WAKE_DOORS) do d.hash = wakeU32(GetHashKey(d.name)) end
 

@@ -2,53 +2,18 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Whippy'
-description 'Mirror Park homes: every Mirror Park house (71 homes, 16 designs) as a walk-in home, plus 25 walk-in garages (one area resource)'
-version '0.11.13'
+description 'Mirror Park homes: every Mirror Park house (71 homes, 16 designs) as a walk-in home, plus 25 walk-in garages (one area resource, for Legacy and GTA V Enhanced)'
+version '0.12.0'
 
 -- One resource owns the area's stock overrides (hei_id2_21* maps, regional collision, night-window LODs, occluders)
 -- so the homes never fight over the same stock files. Do not run the retired whippy_test_bungalow alongside it.
 this_is_a_map 'yes'
+-- BOTH GAMES (0.12.0). stream/ is the Legacy build and stream_enhanced/ the GTA V Enhanced (gen9) one: Enhanced streams
+-- stream_enhanced/ instead of stream/ when it is there. The two hold the same 629 file names; stream_enhanced/ is built
+-- from stream/ by Alchemist through .githooks/enhanced_assets.py, and the pre-commit hook converts whatever a commit
+-- changes in stream/. The ytyps load through the data_file lines below, so none of them is in files {}: on Enhanced
+-- nothing from stream/ may be (as whip_autos_shop).
 files {
-    'stream/mp_d01_types.ytyp',
-    'stream/mp_d05_types.ytyp',
-    'stream/mp_d07_types.ytyp',
-    'stream/mp_d08_types.ytyp',
-    'stream/mp_d10_types.ytyp',
-    'stream/mp_d11_types.ytyp',
-    'stream/mp_d15_types.ytyp',
-    'stream/mp_d17_types.ytyp',
-    'stream/mp_d18_types.ytyp',
-    'stream/mp_d19_types.ytyp',
-    'stream/mp_d20_types.ytyp',
-    'stream/mp_h1_types.ytyp',
-    'stream/mp_h2_types.ytyp',
-    'stream/mp_h3_types.ytyp',
-    'stream/mp_h4_types.ytyp',
-    'stream/wh_bng_types.ytyp',
-    'stream/mp_d01_int.ytyp',
-    'stream/mp_d05_int.ytyp',
-    'stream/mp_d07_int.ytyp',
-    'stream/mp_d08_int.ytyp',
-    'stream/mp_d10_int.ytyp',
-    'stream/mp_d11_int.ytyp',
-    'stream/mp_d15_int.ytyp',
-    'stream/mp_d17_int.ytyp',
-    'stream/mp_d18_int.ytyp',
-    'stream/mp_d19_int.ytyp',
-    'stream/mp_d20_int.ytyp',
-    'stream/mp_h1_int.ytyp',
-    'stream/mp_h2_int.ytyp',
-    'stream/mp_h3_int.ytyp',
-    'stream/mp_h4_int.ytyp',
-    'stream/wh_bng_int.ytyp',
-    'stream/mp_d10v1_int.ytyp',
-    'stream/mp_d10v2_int.ytyp',
-    'stream/mp_d11v1_int.ytyp',
-    'stream/mp_h2v1_int.ytyp',
-    'stream/mp_h3v1_int.ytyp',
-    'stream/wh_bngv1_int.ytyp',
-    'stream/mp_site_garages_types.ytyp',
-    'stream/mp_site_garages_int.ytyp',
     'interiorproxies.meta',
     'gtxd.meta'
 }
@@ -111,6 +76,6 @@ client_script 'client.lua'
 -- through server.lua's exports (GetThemes, GetHomes, SetAllThemes, SetHomeTheme); client.lua applies it.
 server_script 'server.lua'
 whip_interior_themes 'v1'
--- 0.11.12: which game this copy is for. client.lua leaves its garage door wake-up off on Legacy, where FiveM's own
--- patch does it; scripts/build_enhanced.sh writes 'enhanced' into the Enhanced copy.
-mirror_park_game 'legacy'
+-- 0.12.0: which game the server runs is whip's whip_platform convar (setr whip_platform enhanced on Enhanced), read by
+-- client.lua: it leaves its garage door wake-up off on Legacy, where FiveM's own patch does it. (0.11.12 to 0.11.13
+-- had a mirror_park_game line here, written into a separate Enhanced copy.)
