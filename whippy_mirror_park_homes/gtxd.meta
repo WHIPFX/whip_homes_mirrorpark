@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CMapParentTxds>
+  <txdRelationships>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_1</child>
+    </Item>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_2</child>
+    </Item>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_3</child>
+    </Item>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_4</child>
+    </Item>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_5</child>
+    </Item>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_6</child>
+    </Item>
+    <Item>
+      <parent>wh_bng_textures</parent>
+      <child>wh_theme_7</child>
+    </Item>
+  </txdRelationships>
+</CMapParentTxds>
