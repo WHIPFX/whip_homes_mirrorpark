@@ -457,12 +457,12 @@ end)
 RegisterCommand('wh_garage_doors', function(_, args)
     if args[1] == 'off' or args[1] == 'on' then
         wakeOn = args[1] == 'on'
-        print(('[whippy_mirror_park_homes] garage door wake-up %s'):format(wakeOn and 'ON' or 'OFF (GTA alone)'))
+        print(('[whip_homes_mirrorpark] garage door wake-up %s'):format(wakeOn and 'ON' or 'OFF (GTA alone)'))
         return
     end
     local ped = PlayerPedId()
     local p = GetEntityCoords(ped)
-    print(('[whippy_mirror_park_homes] garage door wake-up %s (%d doors, %s copy); you: interior %d room %d'):format(
+    print(('[whip_homes_mirrorpark] garage door wake-up %s (%d doors, %s copy); you: interior %d room %d'):format(
         wakeOn and 'ON' or 'OFF', #WAKE_DOORS, tostring(WAKE_GAME or '?'), GetInteriorFromEntity(ped), GetRoomKeyFromEntity(ped)))
     local shown = 0
     for _, d in ipairs(WAKE_DOORS) do
@@ -488,7 +488,7 @@ CreateThread(function()
     for _, other in ipairs({ 'whippy_test_bungalow', 'whippy_test_bungalow_enhanced' }) do
         local state = GetResourceState(other)
         if state == 'started' or state == 'starting' then
-            local msg = ('[whippy_mirror_park_homes] WARNING: %s is also running. It is retired and overrides the same stock files; remove it (this resource contains the bungalow).'):format(other)
+            local msg = ('[whip_homes_mirrorpark] WARNING: %s is also running. It is retired and overrides the same stock files; remove it (this resource contains the bungalow).'):format(other)
             print(msg)
             TriggerEvent('chat:addMessage', { args = { msg } })
         end
@@ -538,7 +538,7 @@ local function drivewayStatus()
     for _, b in ipairs(DRIVEWAY_BLOCKS) do
         if DoesScenarioBlockingAreaExist(b.min.x, b.min.y, b.min.z, b.max.x, b.max.y, b.max.z) then active = active + 1 end
     end
-    print(('[whippy_mirror_park_homes] driveway car spawns: %d/%d scenario points blocked, 26 car generators removed from the maps'):format(active, #DRIVEWAY_BLOCKS))
+    print(('[whip_homes_mirrorpark] driveway car spawns: %d/%d scenario points blocked, 26 car generators removed from the maps'):format(active, #DRIVEWAY_BLOCKS))
 end
 
 -- Matte-window prototype. Far away the plugged homes show Rockstar's original windows and closed doors. The map's own
@@ -937,7 +937,7 @@ end)
 --     ready frame, before whip_core makes its furniture (1 s after IsInteriorReady); a later change on a ready copy is
 --     switched and refreshed at once, behind a short screen fade for a player inside.
 -- Every refresh: TriggerEvent('whip_core:interiorRefreshed', interiorId) (whip_core's generic event: it rebuilds the
--- furniture on that interior) and TriggerEvent('whippy_mirror_park_homes:themeApplied', home, interiorId, theme,
+-- furniture on that interior) and TriggerEvent('whip_homes_mirrorpark:themeApplied', home, interiorId, theme,
 -- wasInside, true); a switch without a refresh fires themeApplied with refreshed = false.
 local THEME_COUNT = 8
 local THEME_SETS = {}
@@ -980,7 +980,7 @@ local function curtainEvent(untilMs)
 end
 for _, h in ipairs(GLASS_HOUSES) do h.themeIds, h.themeRefresh, h.curtainUntil = {}, {}, math.huge end
 local function themeApplied(h, id, theme, inside, refreshed)
-    TriggerEvent('whippy_mirror_park_homes:themeApplied', h.key, id, theme, inside, refreshed)
+    TriggerEvent('whip_homes_mirrorpark:themeApplied', h.key, id, theme, inside, refreshed)
 end
 local function refreshTheme(h, id, theme)
     local inside = GetInteriorFromEntity(PlayerPedId()) == id
@@ -1308,7 +1308,7 @@ local function step(h, now, cx, cy, cz, px, py, pz, fade)
         if want ~= (h.disabled or false) then
             DisableInterior(h.interiorId, want)
             h.disabled = want
-            print(('[whippy_mirror_park_homes] %s interior %s at %.1fm'):format(h.key, want and 'force-disabled' or 're-enabled', near))
+            print(('[whip_homes_mirrorpark] %s interior %s at %.1fm'):format(h.key, want and 'force-disabled' or 're-enabled', near))
         end
         if forceUnload then gap = math.min(gap, h.disabled and (near - h.forceOn) or (h.forceOff - near)) end
     end
@@ -1438,9 +1438,9 @@ local function nativeState(h)
 end
 
 local function glassStatus()
-    print(('[whippy_mirror_park_homes] glass mode=%s fadeFar=%.1f fadeNear=%.1f (distances from the house origin, x graphics scaling for map layers)'):format(glassMode, fadeFar, fadeNear))
+    print(('[whip_homes_mirrorpark] glass mode=%s fadeFar=%.1f fadeNear=%.1f (distances from the house origin, x graphics scaling for map layers)'):format(glassMode, fadeFar, fadeNear))
     for _, h in ipairs(GLASS_HOUSES) do
-        print(('[whippy_mirror_park_homes] %s wallDistance=%.1f originDistance=%.1f nativeGlass=%s fadeCopy=%s alpha=%s interior=%s'):format(
+        print(('[whip_homes_mirrorpark] %s wallDistance=%.1f originDistance=%.1f nativeGlass=%s fadeCopy=%s alpha=%s interior=%s'):format(
             h.key .. (' [glass %d, interior %d, forced off/on %.0f/%.0f m]'):format(h.glass, h.interior, h.forceOff, h.forceOn), h.distance or -1, h.originDistance or -1, nativeState(h),
             tostring(h.obj ~= nil and DoesEntityExist(h.obj)), tostring(h.alpha), GetInteriorAtCoords(h.origin.x, h.origin.y, h.origin.z + 1.0)))
     end
@@ -1467,14 +1467,14 @@ end)
 -- wh_unload            toggle the forced unload (on by default), to compare with the engine's own (scaled) distance
 RegisterCommand('wh_unload', function()
     if LOADER ~= 'ipl' then
-        print('[whippy_mirror_park_homes] loader mode static: the interior budget already switches interiors (wh_unload not used)')
+        print('[whip_homes_mirrorpark] loader mode static: the interior budget already switches interiors (wh_unload not used)')
         return
     end
     forceUnload = not forceUnload
     for _, h in ipairs(GLASS_HOUSES) do
         if not forceUnload and h.disabled and h.interiorId ~= 0 then DisableInterior(h.interiorId, false); h.disabled = false end
     end
-    print(('[whippy_mirror_park_homes] forced interior unload %s (per home, see wh_glass)'):format(forceUnload and 'ON' or 'off'))
+    print(('[whip_homes_mirrorpark] forced interior unload %s (per home, see wh_glass)'):format(forceUnload and 'ON' or 'off'))
 end, false)
 
 -- wh_glass                 status
@@ -1482,13 +1482,13 @@ end, false)
 -- wh_glass fade 16 12      fade mode with fadeFar / fadeNear in metres from the walls (saved)
 RegisterCommand('wh_glass', function(_, args)
     local mode = args[1]
-    if DIAGNOSTIC then print('[whippy_mirror_park_homes] diagnostic build: glass transitions are removed (clear glass to 150 m)'); mode = nil end
+    if DIAGNOSTIC then print('[whip_homes_mirrorpark] diagnostic build: glass transitions are removed (clear glass to 150 m)'); mode = nil end
     if mode == 'fade' or mode == 'native' then
         glassMode = mode
         pcall(SetResourceKvp, 'wh_glass_mode', mode)
         local far, near = tonumber(args[2]), tonumber(args[3])
         if far and near and far > near and near >= 0 then
-            if far > 24.0 then print(('[whippy_mirror_park_homes] note: beyond %.0f m the native glass swap may still show matte glass on the far side'):format(24.0)) end
+            if far > 24.0 then print(('[whip_homes_mirrorpark] note: beyond %.0f m the native glass swap may still show matte glass on the far side'):format(24.0)) end
             fadeFar, fadeNear = far, near
             pcall(SetResourceKvp, 'wh_glass_far_v3', tostring(far)); pcall(SetResourceKvp, 'wh_glass_near_v3', tostring(near))
         end
@@ -1623,14 +1623,14 @@ local function debugLoop()                  -- runs only while the overlay is on
                     local dist = #(cam - hh.probe)
                     if hh.wasLoaded ~= nil and hh.wasLoaded ~= ready then
                         hh.lastEvent = ('%s at %.1fm'):format(ready and 'loaded' or 'unloaded', dist)
-                        print(('[whippy_mirror_park_homes] %s interior %s'):format(hh.key, hh.lastEvent))
+                        print(('[whip_homes_mirrorpark] %s interior %s'):format(hh.key, hh.lastEvent))
                     end
                     hh.wasLoaded = ready
                     -- three states: DRAWN (its doors were rendered last frame), LOADED (exists, nothing drawn), unloaded
                     local state = drawn > 0 and 'DRAWN' or (ready and 'LOADED' or 'unloaded')
                     if hh.wasState ~= nil and hh.wasState ~= state then
                         hh.lastState = ('%s at %.1fm'):format(state, dist)
-                        print(('[whippy_mirror_park_homes] %s interior %s'):format(hh.key, hh.lastState))
+                        print(('[whip_homes_mirrorpark] %s interior %s'):format(hh.key, hh.lastState))
                     end
                     hh.wasState = state
                     local s = ('%s %.1fm  interior %s %s %s doors %d/%d (in interior %d) drawn %d  readyFlag %s%s%s'):format(hh.key, dist,
@@ -1653,7 +1653,7 @@ local function debugLoop()                  -- runs only while the overlay is on
                     rows[#rows + 1] = { s, col[1], col[2], col[3] }
                 end
             end
-            dtext(0.01, 0.30, ('whippy_mirror_park_homes %s  loader %s  glass=%s fade %.0f->%.0f m from walls  forced unload %s (per home)  budget homes %d/%d rooms %d/%d portals %d/%d  ready interiors %d/%d'):format(VERSION, LOADER, glassMode, fadeFar, fadeNear, LOADER == 'ipl' and (forceUnload and 'ON' or 'off') or 'n/a', budgetUsed.homes, MAX_HOMES, budgetUsed.rooms, ROOM_BUDGET, budgetUsed.portals, PORTAL_BUDGET, readyCount, #GLASS_HOUSES), 255, 220, 120)
+            dtext(0.01, 0.30, ('whip_homes_mirrorpark %s  loader %s  glass=%s fade %.0f->%.0f m from walls  forced unload %s (per home)  budget homes %d/%d rooms %d/%d portals %d/%d  ready interiors %d/%d'):format(VERSION, LOADER, glassMode, fadeFar, fadeNear, LOADER == 'ipl' and (forceUnload and 'ON' or 'off') or 'n/a', budgetUsed.homes, MAX_HOMES, budgetUsed.rooms, ROOM_BUDGET, budgetUsed.portals, PORTAL_BUDGET, readyCount, #GLASS_HOUSES), 255, 220, 120)
             for i, r in ipairs(rows) do dtext(0.01, 0.30 + i * 0.022, r[1], r[2], r[3], r[4]) end
             Wait(0)
         end
@@ -1670,26 +1670,26 @@ RegisterCommand('wh_xray', function()
         else RemoveModelHide(h.origin.x, h.origin.y, h.origin.z, 25.0, plug, false) end
     end
     glassMode = xray and 'xray' or (GetResourceKvpString('wh_glass_mode') or 'fade')
-    print('[whippy_mirror_park_homes] xray ' .. (xray and 'ON: matte plug and fade copy hidden on this client' or 'off'))
+    print('[whip_homes_mirrorpark] xray ' .. (xray and 'ON: matte plug and fade copy hidden on this client' or 'off'))
 end, false)
 
 RegisterCommand('wh_debug', function()
     debugOn = not debugOn
     if debugOn then CreateThread(debugLoop) end
-    print('[whippy_mirror_park_homes] debug overlay ' .. (debugOn and 'on' or 'off'))
+    print('[whip_homes_mirrorpark] debug overlay ' .. (debugOn and 'on' or 'off'))
 end, false)
 
 -- Read-only test helper: run wh_home_check (or wh_bungalow_check) in F8 while standing inside a home.
 local function check()
     local ped = PlayerPedId()
     local p = GetEntityCoords(ped)
-    print(('[whippy_mirror_park_homes] version=%s position=%.3f, %.3f, %.3f interior=%s room=%s'):format(
+    print(('[whip_homes_mirrorpark] version=%s position=%.3f, %.3f, %.3f interior=%s room=%s'):format(
         VERSION, p.x, p.y, p.z, GetInteriorFromEntity(ped), GetRoomKeyFromEntity(ped)))
     local camera = GetGameplayCamCoord()
-    print(('[whippy_mirror_park_homes] camera=%.3f, %.3f, %.3f viewMode=%s cameraInterior=%s cameraRoom=%s'):format(
+    print(('[whip_homes_mirrorpark] camera=%.3f, %.3f, %.3f viewMode=%s cameraInterior=%s cameraRoom=%s'):format(
         camera.x, camera.y, camera.z, GetFollowPedCamViewMode(), GetInteriorFromPrimaryView(), GetRoomKeyForGameViewport()))
     for _, other in ipairs({ 'whippy_test_bungalow', 'whippy_test_bungalow_enhanced' }) do
-        print(('[whippy_mirror_park_homes] %s state=%s'):format(other, GetResourceState(other)))
+        print(('[whip_homes_mirrorpark] %s state=%s'):format(other, GetResourceState(other)))
     end
     local pool = GetGamePool('CObject')
     for _, door in ipairs(doors) do
@@ -1698,7 +1698,7 @@ local function check()
             for _, object in ipairs(pool) do
                 if GetEntityModel(object) == door.modelHash and #(GetEntityCoords(object) - door.position) < 5.0 then handles = handles + 1 end
             end
-            print(('[whippy_mirror_park_homes] %s nearbyObjects=%d'):format(door.model, handles))
+            print(('[whip_homes_mirrorpark] %s nearbyObjects=%d'):format(door.model, handles))
         end
     end
 end
@@ -1708,7 +1708,7 @@ RegisterCommand('wh_budget', function(_, args)
         MAX_HOMES, ROOM_BUDGET, PORTAL_BUDGET = a, b, c
         pcall(SetResourceKvp, 'wh_budget_homes', tostring(a)); pcall(SetResourceKvp, 'wh_budget_rooms', tostring(b)); pcall(SetResourceKvp, 'wh_budget_portals', tostring(c))
     end
-    print(('[whippy_mirror_park_homes] interior budget (loader %s): homes %d/%d rooms %d/%d portals %d/%d'):format(LOADER, budgetUsed.homes, MAX_HOMES, budgetUsed.rooms, ROOM_BUDGET, budgetUsed.portals, PORTAL_BUDGET))
+    print(('[whip_homes_mirrorpark] interior budget (loader %s): homes %d/%d rooms %d/%d portals %d/%d'):format(LOADER, budgetUsed.homes, MAX_HOMES, budgetUsed.rooms, ROOM_BUDGET, budgetUsed.portals, PORTAL_BUDGET))
     for _, h in ipairs(GLASS_HOUSES) do
         if inBudget(h) then print(('  %s %s  %.0f m  rooms %d portals %d  interior %s'):format(LOADER == 'ipl' and 'loaded' or 'enabled', h.key, h.loadDistance or -1, h.rooms, h.portals, istate(h.interiorId))) end
     end
