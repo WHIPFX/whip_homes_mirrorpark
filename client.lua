@@ -1194,7 +1194,7 @@ end
 
 -- Per-home constants, computed once. The homes only rotate about Z (make_client asserts it), so world -> local is a
 -- 2D rotation by -yaw; the outline edges are pre-split into scalars so the per-tick maths allocates nothing.
-local atan2 = math.atan2 or math.atan
+local atan2 = math.atan   -- Lua 5.3+ math.atan(y, x) is atan2
 for _, h in ipairs(GLASS_HOUSES) do
     local yaw = 2.0 * atan2(h.q.z, h.q.w)
     h.cs, h.sn = math.cos(-yaw), math.sin(-yaw)
