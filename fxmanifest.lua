@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Whippy'
 description 'Mirror Park homes: every Mirror Park house (71 homes, 16 designs) as a walk-in home, plus 25 walk-in garages (one area resource, for Legacy and GTA V Enhanced)'
-version '0.12.0'
+version '0.12.1'
 
 -- One resource owns the area's stock overrides (hei_id2_21* maps, regional collision, night-window LODs, occluders)
 -- so the homes never fight over the same stock files. Do not run the retired whippy_test_bungalow alongside it.
