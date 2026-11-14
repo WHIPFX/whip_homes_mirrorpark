@@ -43,6 +43,9 @@ The looks use whip_core's interior themes: the pack declares `whip_interior_them
 has the server exports whip_core reads (`GetThemes`, `GetHomes`, `SetAllThemes`, `SetHomeTheme`, plus
 `GetHomeTheme`). See **Interior themes** in whip_core's `docs.html` to give your own interiors looks the same way.
 
+The F8 commands (`wh_glass`, `wh_xray`, `wh_debug`, `wh_budget`, `wh_theme` and the rest) are tools for working on
+the homes. They work only with WHIP's developer mode on (`/w`, for players with `whip.devtools`).
+
 ## License
 
 whip_homes_mirrorpark's code (`fxmanifest.lua`, `client.lua`, `server.lua`, the `.meta` files, `.githooks/`) is

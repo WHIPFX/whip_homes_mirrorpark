@@ -2,6 +2,21 @@
 -- warning and read-only diagnostics. The homes' doors are NOT registered here: the server's door system (whip_core)
 -- owns them (user decision 2026-10-04; a second door-system key for the same door can be refused by the game).
 local VERSION = '0.12.0'
+
+--- The F8 tools in this file (wh_xray, wh_glass, wh_budget, wh_debug...) are for developers. They work only with WHIP's
+--- developer mode on (whip_core's /w, which needs whip.devtools): wh_xray alone would let a player see through every
+--- home's windows. Without whip_core running there is no developer mode, so they stay off.
+local function devCommand(name, fn)
+    RegisterCommand(name, function(source, args, raw)
+        local ok, on = pcall(function() return exports.whip_core:HasDevTools() end)
+        if not (ok and on == true) then
+            local why = ('/%s is a developer tool: turn developer mode on in /w'):format(name)
+            if not pcall(function() exports.whip_core:Notify(why, 'error') end) then print('[whip_homes_mirrorpark] ' .. why) end
+            return
+        end
+        return fn(source, args, raw)
+    end, false)
+end
 local doors = {
     { id = 'whippy_mp_mp_d01_p01_mp_d01_door_01', model = 'mp_d01_door_01', house = 'mp_d01_p01', position = vector3(905.6659849, -489.3123253, 59.5532800) },
     { id = 'whippy_mp_mp_d01_p01_mp_d01_door_02', model = 'mp_d01_door_02', house = 'mp_d01_p01', position = vector3(899.2794967, -474.6458880, 59.5682800) },
@@ -455,7 +470,7 @@ CreateThread(function()
     end
 end)
 
-RegisterCommand('wh_garage_doors', function(_, args)
+devCommand('wh_garage_doors', function(_, args)
     if args[1] == 'off' or args[1] == 'on' then
         wakeOn = args[1] == 'on'
         print(('[whip_homes_mirrorpark] garage door wake-up %s'):format(wakeOn and 'ON' or 'OFF (GTA alone)'))
@@ -480,7 +495,7 @@ RegisterCommand('wh_garage_doors', function(_, args)
         end
     end
     if shown == 0 then print('  no garage door within 30 m') end
-end, false)
+end)
 
 -- The retired standalone bungalow resource (whippy_test_bungalow) overrides the same stock map files (the four other homes untouched).
 -- If it runs too, whichever loads last wins and the new homes show their old stock exteriors.
@@ -709,10 +724,10 @@ local REVEAL_LOG = false
 local function revealLog(h, msg)
     if REVEAL_LOG then print(('[wh_reveal] %d %s %s (walls %.1f m)'):format(GetGameTimer(), h.key, msg, h.loadDistance or -1)) end
 end
-RegisterCommand('wh_reveal', function()
+devCommand('wh_reveal', function()
     REVEAL_LOG = not REVEAL_LOG
     print('[wh_reveal] log ' .. (REVEAL_LOG and 'ON' or 'off'))
-end, false)
+end)
 -- interior handle = pool index * 256 + generation byte: "189954[742/2 vr-]" = index 742, gen 2, valid, ready, not disabled
 local function istate(id)
     if not id or id == 0 then return '0' end
@@ -1466,7 +1481,7 @@ AddEventHandler('onResourceStop', function(resourceName)
 end)
 
 -- wh_unload            toggle the forced unload (on by default), to compare with the engine's own (scaled) distance
-RegisterCommand('wh_unload', function()
+devCommand('wh_unload', function()
     if LOADER ~= 'ipl' then
         print('[whip_homes_mirrorpark] loader mode static: the interior budget already switches interiors (wh_unload not used)')
         return
@@ -1476,12 +1491,12 @@ RegisterCommand('wh_unload', function()
         if not forceUnload and h.disabled and h.interiorId ~= 0 then DisableInterior(h.interiorId, false); h.disabled = false end
     end
     print(('[whip_homes_mirrorpark] forced interior unload %s (per home, see wh_glass)'):format(forceUnload and 'ON' or 'off'))
-end, false)
+end)
 
 -- wh_glass                 status
 -- wh_glass native|fade     switch mode (saved)
 -- wh_glass fade 16 12      fade mode with fadeFar / fadeNear in metres from the walls (saved)
-RegisterCommand('wh_glass', function(_, args)
+devCommand('wh_glass', function(_, args)
     local mode = args[1]
     if DIAGNOSTIC then print('[whip_homes_mirrorpark] diagnostic build: glass transitions are removed (clear glass to 150 m)'); mode = nil end
     if mode == 'fade' or mode == 'native' then
@@ -1496,7 +1511,7 @@ RegisterCommand('wh_glass', function(_, args)
         for _, h in ipairs(GLASS_HOUSES) do h.alpha = nil end
     end
     glassStatus()
-end, false)
+end)
 
 -- Streaming debug overlay (wh_debug): per home, whether the interior is instanced (its door objects exist), whether the
 -- camera is inside it, how many of its door objects exist (they only exist while the interior is populated) and how
@@ -1663,7 +1678,7 @@ end
 -- wh_xray: local-only visual test. Hides the map's matte plug (model hide, this client only) and the fade copy, so the
 -- window openings show whatever the engine really draws behind them at any distance (interior walls, other players).
 local xray = false
-RegisterCommand('wh_xray', function()
+devCommand('wh_xray', function()
     xray = not xray
     for _, h in ipairs(GLASS_HOUSES) do
         local plug = joaat(h.key .. '_plug')
@@ -1672,13 +1687,13 @@ RegisterCommand('wh_xray', function()
     end
     glassMode = xray and 'xray' or (GetResourceKvpString('wh_glass_mode') or 'fade')
     print('[whip_homes_mirrorpark] xray ' .. (xray and 'ON: matte plug and fade copy hidden on this client' or 'off'))
-end, false)
+end)
 
-RegisterCommand('wh_debug', function()
+devCommand('wh_debug', function()
     debugOn = not debugOn
     if debugOn then CreateThread(debugLoop) end
     print('[whip_homes_mirrorpark] debug overlay ' .. (debugOn and 'on' or 'off'))
-end, false)
+end)
 
 -- Read-only test helper: run wh_home_check (or wh_bungalow_check) in F8 while standing inside a home.
 local function check()
@@ -1703,7 +1718,7 @@ local function check()
         end
     end
 end
-RegisterCommand('wh_budget', function(_, args)
+devCommand('wh_budget', function(_, args)
     local a, b, c = tonumber(args[1]), tonumber(args[2]), tonumber(args[3])
     if a and b and c then
         MAX_HOMES, ROOM_BUDGET, PORTAL_BUDGET = a, b, c
@@ -1713,7 +1728,7 @@ RegisterCommand('wh_budget', function(_, args)
     for _, h in ipairs(GLASS_HOUSES) do
         if inBudget(h) then print(('  %s %s  %.0f m  rooms %d portals %d  interior %s'):format(LOADER == 'ipl' and 'loaded' or 'enabled', h.key, h.loadDistance or -1, h.rooms, h.portals, istate(h.interiorId))) end
     end
-end, false)
+end)
 -- wh_ground            0.6.3: stand where you fall through and run this: what collision is under you (map-only ray, any ray,
 --                      ground z) and which interior the spot / your ped / that collision belongs to (F8 + client log)
 --                      0.6.9: a ray that hits map collision returns a handle GetEntityModel crashes on (the user's script
@@ -1741,7 +1756,7 @@ local function groundReport(tag, p)
         tostring(IsCollisionMarkedOutside(p.x, p.y, p.z)), tostring(HasCollisionLoadedAroundEntity(ped))))
 end
 local groundWatch = false
-RegisterCommand('wh_ground', function(_, args)
+devCommand('wh_ground', function(_, args)
     if args[1] ~= 'watch' then groundReport('ped', GetEntityCoords(PlayerPedId())); return end
     groundWatch = not groundWatch
     print('[wh_ground] watch ' .. (groundWatch and 'ON: walk over the hole, the spot you fall from is logged (wh_ground watch again = off)' or 'off'))
@@ -1759,12 +1774,12 @@ RegisterCommand('wh_ground', function(_, args)
             Wait(50)
         end
     end)
-end, false)
+end)
 -- wh_stairs            0.9.2: toggles a readout of the ped's stair state while you walk a flight (ped config flags from
 --                      FiveM's natives list, names unverified there: 147 StairsDetected, 148 SlopeDetected, 253 OnStairs,
 --                      270 OnStairSlope): on screen every frame, and an F8 line with your position at every change
 local stairsWatch = false
-RegisterCommand('wh_stairs', function()
+devCommand('wh_stairs', function()
     stairsWatch = not stairsWatch
     print('[wh_stairs] ' .. (stairsWatch and 'ON: walk up and down the stairs (wh_stairs again = off)' or 'off'))
     if not stairsWatch then return end
@@ -1784,7 +1799,7 @@ RegisterCommand('wh_stairs', function()
             Wait(0)
         end
     end)
-end, false)
+end)
 -- 0.8.0 themes. wh_theme                          the loaded homes: own interior, wanted theme, active sets
 --               wh_theme <home|here> <0-N|off>    preview a theme on this client only; off = back to whip_core's choice
 local function homeHere()
@@ -1797,7 +1812,7 @@ local function homeHere()
     end
     return best
 end
-RegisterCommand('wh_theme', function(_, args)
+devCommand('wh_theme', function(_, args)
     if #args == 0 then
         print(('[wh_theme] server table %s'):format(themeTable == nil and 'not arrived' or 'arrived'))
         for _, h in ipairs(GLASS_HOUSES) do
@@ -1828,7 +1843,7 @@ RegisterCommand('wh_theme', function(_, args)
     end
     themePreview[h.key] = t
     print(('[wh_theme] %s: preview %s on this client only (whip_core / server theme %s)'):format(h.key, tostring(t or 'off'), tostring((themeTable or {})[h.key] or 0)))
-end, false)
+end)
 -- client exports for whip_core: the home (and its live interior) at a point, and a home's current theme
 exports('GetHomeAt', function(coords)
     local c = coords or GetEntityCoords(PlayerPedId())
@@ -1845,5 +1860,5 @@ exports('GetHomeTheme', function(key)
     return nil
 end)
 
-RegisterCommand('wh_home_check', function() check(); glassStatus(); drivewayStatus() end, false)
-RegisterCommand('wh_bungalow_check', check, false)
+devCommand('wh_home_check', function() check(); glassStatus(); drivewayStatus() end)
+devCommand('wh_bungalow_check', check)
