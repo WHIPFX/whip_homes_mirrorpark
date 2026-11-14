@@ -45,6 +45,9 @@ has the server exports whip_core reads (`GetThemes`, `GetHomes`, `SetAllThemes`,
 
 ## License
 
-This repository has no licence file of its own. whip_core's `NOTICE.md` lists this map pack as Rockstar Games'
-material: made from Grand Theft Auto V and used under the Cfx.re Creator Platform License Agreement. WHIP's licence
-doesn't cover it. WHIP is not affiliated with, endorsed or sponsored by Rockstar Games or Take-Two Interactive.
+whip_homes_mirrorpark's code (`fxmanifest.lua`, `client.lua`, `server.lua`, the `.meta` files, `.githooks/`) is
+licensed under the GNU LGPL 3.0; see `COPYING.LESSER`, and `COPYING` for the GPL 3.0 it builds on.
+
+Its map files (`stream/`, `stream_enhanced/`) are made from Grand Theft Auto V and belong to Rockstar Games: WHIP's
+licence doesn't cover them. See `NOTICE.md`. WHIP is not affiliated with, endorsed or sponsored by Rockstar Games or
+Take-Two Interactive.
