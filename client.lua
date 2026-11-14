@@ -641,10 +641,11 @@ local DIAGNOSTIC = false
 local glassMode, fadeFar, fadeNear = 'fade', 16.0, 12.0
 pcall(function()
     if DIAGNOSTIC then glassMode = 'off (diagnostic build)'; return end
-    glassMode = GetResourceKvpString('wh_glass_mode') or glassMode
-    -- v3 (0.11.7): the reveal band; values saved by wh_glass for the old 24 -> 12 m fade (v2) are not read
-    fadeFar = tonumber(GetResourceKvpString('wh_glass_far_v3') or '') or fadeFar
-    fadeNear = tonumber(GetResourceKvpString('wh_glass_near_v3') or '') or fadeNear
+    glassMode = GetResourceKvpString('wh_glass_mode_dev') or glassMode
+    -- _dev (0.12.0): saved by wh_glass and wh_budget only in developer mode. What they saved while every player could
+    -- run them (no suffix, and v3 for the reveal band) is not read, so a player's old wh_glass native stops applying.
+    fadeFar = tonumber(GetResourceKvpString('wh_glass_far_dev') or '') or fadeFar
+    fadeNear = tonumber(GetResourceKvpString('wh_glass_near_dev') or '') or fadeNear
 end)
 -- camera to origin. The copy stays (opaque) well past the native layers' own transitions (glass 40, exterior 50: the
 -- engine blends them over several metres, 0.1.5 showed see-through gaps up to ~55 m once the copy left at 47 m)
@@ -694,9 +695,9 @@ local LOOKAHEAD_S = 6.0
 -- slot (it is inside or about to reach the reveal band, REVEAL_FAR 16 m).
 local CLOSING_MAX, LOOKAHEAD_MAX, PROTECT = 8.0, 15.0, 20.0
 pcall(function()
-    MAX_HOMES = tonumber(GetResourceKvpString('wh_budget_homes') or '') or MAX_HOMES
-    ROOM_BUDGET = tonumber(GetResourceKvpString('wh_budget_rooms') or '') or ROOM_BUDGET
-    PORTAL_BUDGET = tonumber(GetResourceKvpString('wh_budget_portals') or '') or PORTAL_BUDGET
+    MAX_HOMES = tonumber(GetResourceKvpString('wh_budget_homes_dev') or '') or MAX_HOMES
+    ROOM_BUDGET = tonumber(GetResourceKvpString('wh_budget_rooms_dev') or '') or ROOM_BUDGET
+    PORTAL_BUDGET = tonumber(GetResourceKvpString('wh_budget_portals_dev') or '') or PORTAL_BUDGET
 end)
 local budgetUsed = { homes = 0, rooms = 0, portals = 0 }
 
@@ -1501,12 +1502,12 @@ devCommand('wh_glass', function(_, args)
     if DIAGNOSTIC then print('[whip_homes_mirrorpark] diagnostic build: glass transitions are removed (clear glass to 150 m)'); mode = nil end
     if mode == 'fade' or mode == 'native' then
         glassMode = mode
-        pcall(SetResourceKvp, 'wh_glass_mode', mode)
+        pcall(SetResourceKvp, 'wh_glass_mode_dev', mode)
         local far, near = tonumber(args[2]), tonumber(args[3])
         if far and near and far > near and near >= 0 then
             if far > 24.0 then print(('[whip_homes_mirrorpark] note: beyond %.0f m the native glass swap may still show matte glass on the far side'):format(24.0)) end
             fadeFar, fadeNear = far, near
-            pcall(SetResourceKvp, 'wh_glass_far_v3', tostring(far)); pcall(SetResourceKvp, 'wh_glass_near_v3', tostring(near))
+            pcall(SetResourceKvp, 'wh_glass_far_dev', tostring(far)); pcall(SetResourceKvp, 'wh_glass_near_dev', tostring(near))
         end
         for _, h in ipairs(GLASS_HOUSES) do h.alpha = nil end
     end
@@ -1685,7 +1686,7 @@ devCommand('wh_xray', function()
         if xray then CreateModelHide(h.origin.x, h.origin.y, h.origin.z, 25.0, plug, true)
         else RemoveModelHide(h.origin.x, h.origin.y, h.origin.z, 25.0, plug, false) end
     end
-    glassMode = xray and 'xray' or (GetResourceKvpString('wh_glass_mode') or 'fade')
+    glassMode = xray and 'xray' or (GetResourceKvpString('wh_glass_mode_dev') or 'fade')
     print('[whip_homes_mirrorpark] xray ' .. (xray and 'ON: matte plug and fade copy hidden on this client' or 'off'))
 end)
 
@@ -1722,7 +1723,7 @@ devCommand('wh_budget', function(_, args)
     local a, b, c = tonumber(args[1]), tonumber(args[2]), tonumber(args[3])
     if a and b and c then
         MAX_HOMES, ROOM_BUDGET, PORTAL_BUDGET = a, b, c
-        pcall(SetResourceKvp, 'wh_budget_homes', tostring(a)); pcall(SetResourceKvp, 'wh_budget_rooms', tostring(b)); pcall(SetResourceKvp, 'wh_budget_portals', tostring(c))
+        pcall(SetResourceKvp, 'wh_budget_homes_dev', tostring(a)); pcall(SetResourceKvp, 'wh_budget_rooms_dev', tostring(b)); pcall(SetResourceKvp, 'wh_budget_portals_dev', tostring(c))
     end
     print(('[whip_homes_mirrorpark] interior budget (loader %s): homes %d/%d rooms %d/%d portals %d/%d'):format(LOADER, budgetUsed.homes, MAX_HOMES, budgetUsed.rooms, ROOM_BUDGET, budgetUsed.portals, PORTAL_BUDGET))
     for _, h in ipairs(GLASS_HOUSES) do
