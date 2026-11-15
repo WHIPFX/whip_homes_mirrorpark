@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Whippy'
 description 'Mirror Park homes: every Mirror Park house (71 homes, 16 designs) as a walk-in home, plus 25 walk-in garages (one area resource, for Legacy and GTA V Enhanced)'
-version '0.12.1'
+version '1.0.0'
 whip_updates 'WHIPFX/whip_homes_mirrorpark'   -- whip_core checks this repository's releases for a newer version
 
 -- One resource owns the area's stock overrides (hei_id2_21* maps, regional collision, night-window LODs, occluders)
