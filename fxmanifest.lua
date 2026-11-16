@@ -77,6 +77,3 @@ client_script 'client.lua'
 -- through server.lua's exports (GetThemes, GetHomes, SetAllThemes, SetHomeTheme); client.lua applies it.
 server_script 'server.lua'
 whip_interior_themes 'v1'
--- 0.12.0: which game the server runs is whip's whip_platform convar (setr whip_platform enhanced on Enhanced), read by
--- client.lua: it leaves its garage door wake-up off on Legacy, where FiveM's own patch does it. (0.11.12 to 0.11.13
--- had a mirror_park_game line here, written into a separate Enhanced copy.)

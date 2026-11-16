@@ -15,8 +15,7 @@ Every house in Mirror Park as a walk-in home for [WHIP](https://github.com/WHIPF
 ## Requirements
 
 - `whip_core`. This pack builds the houses; WHIP makes them homes that players buy, lock and furnish.
-- FiveM Legacy or GTA V Enhanced. The models come twice: `stream/` for Legacy and `stream_enhanced/` for Enhanced. An
-  Enhanced server needs `setr whip_platform enhanced` in `server.cfg`.
+- FiveM Legacy or GTA V Enhanced. The models come twice: `stream/` for Legacy and `stream_enhanced/` for Enhanced.
 
 ## Installation
 
